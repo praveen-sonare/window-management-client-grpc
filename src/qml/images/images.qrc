@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>AGL_HMI_Blue_Background_NoCar-01.png</file>
+    </qresource>
+</RCC>
