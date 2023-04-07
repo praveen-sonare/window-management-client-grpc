@@ -12,6 +12,7 @@ service AglShellManagerService {
        rpc AppStatusState(AppStateRequest)			returns (stream AppStateResponse) {}
        rpc GetOutputs(OutputRequest)				returns (ListOutputResponse) {}
        rpc SetAppNormal(NormalRequest)				returns (NormalResponse) {}
+       rpc SetAppOnOutput(AppOnOutputRequest)			returns (AppOnOutputResponse) {}
 }
 
 message ActivateRequest {
@@ -77,4 +78,12 @@ message FullscreenRequest {
 };
 
 message FullscreenResponse {
+};
+
+message AppOnOutputRequest {
+	string app_id = 1;
+	string output = 2;
+};
+
+message AppOnOutputResponse {
 };

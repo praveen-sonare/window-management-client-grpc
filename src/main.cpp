@@ -45,7 +45,7 @@ enum mode {
 	FLOAT = 1,
 	FULLSCREEN = 2,
 	FULLSCREEN_QT = 3,	//  rather than use rpc, use Qt API
-	REMOTE = 4,
+	ON_OTHER_OUTPUTS = 4,
 };
 
 static QWindow *
@@ -72,21 +72,25 @@ int main(int argc, char *argv[])
 	QQmlComponent main_comp(&engine, QUrl("qrc:/Main.qml"));
 
 	if (argc >= 2) {
+		const char *output_name = nullptr;
 		if (strcmp(argv[1], "float") == 0)
 			mmode = FLOAT;
 		else if (strcmp(argv[1], "full") == 0)
 			mmode = FULLSCREEN;
-		else if (strcmp(argv[1], "remote") == 0)
-			mmode = REMOTE;
+		else if (strcmp(argv[1], "on_output") == 0)
+			mmode = ON_OTHER_OUTPUTS;
 		else if (strcmp(argv[1], "full_qt") == 0)
 			mmode = FULLSCREEN_QT;
 		else
 			assert(!"Invalid mode");
 
-		if (mmode != FLOAT && mmode != FULLSCREEN && mmode != REMOTE) {
+		if (mmode != FLOAT && mmode != FULLSCREEN && mmode != ON_OTHER_OUTPUTS) {
 			fprintf(stderr, "Will not use rpc\n");
 			goto skip;
 		}
+
+		if (mmode == ON_OTHER_OUTPUTS)
+		       output_name = argv[2];
 
 		// start grpc connection
 		GrpcClient *client = new GrpcClient();
@@ -104,8 +108,15 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "Setting the application as fullscreen\n");
 			client->SetAppFullscreen(myname.toStdString());
 			break;
-		case REMOTE:
-			fprintf(stderr, "Setting the application as remote\n");
+		case ON_OTHER_OUTPUTS:
+			fprintf(stderr, "Setting application '%s' on output '%s'\n", 
+					myname.toStdString().c_str(), output_name);
+			if (!output_name) {
+				fprintf(stderr, "Output name is not set!\n");
+				exit(EXIT_FAILURE);
+			}
+			client->SetAppOnOutput(myname.toStdString(),
+					       std::string(output_name));
 			break;
 		default:
 			break;

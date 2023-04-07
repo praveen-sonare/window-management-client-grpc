@@ -89,6 +89,21 @@ GrpcClient::SetAppFullscreen(const std::string& app_id)
 	return status.ok();
 }
 
+bool
+GrpcClient::SetAppOnOutput(const std::string& app_id, const std::string& output_name)
+{
+	agl_shell_ipc::AppOnOutputRequest request;
+
+	request.set_app_id(app_id);
+	request.set_output(output_name);
+
+	grpc::ClientContext context;
+	::agl_shell_ipc::AppOnOutputResponse reply;
+
+	grpc::Status status = m_stub->SetAppOnOutput(&context, request, &reply);
+	return status.ok();
+}
+
 grpc::Status
 GrpcClient::Wait(void)
 {
